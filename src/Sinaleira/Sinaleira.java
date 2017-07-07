@@ -1,58 +1,106 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Sinaleira;
 
 import java.util.Random;
-/**
- *
- * @author imortal77
- */
+
 public class Sinaleira{
     
+    private static int qntCriadas = 0;//variavel static, conta quantos objetos foram instanciados
+    private int id;//identificador da Sinaleira
     private ParametroVeiculos veiculos;
     private ParametroTempo tempo;
     private double prioridadeAberturaBaixa;
     private double prioridadeAberturaMedia;
     private double prioridadeAberturaAlta;
-   // private int qntVeiculos;/*quantidade de veiculos na via */
-   // private int tempoAcumulado;/*tempo que a sinaleira esta fechada*/
+    private double defuzzy;//recebe o valor da defazzyficacao
+    private String estado;//O estado da Sinaleira(Aberta/Fechada)
+    private int qntVeiculos;/*quantidade de veiculos na via */
+    private int tempoAcumulado;/*tempo que a sinaleira esta fechada*/
     
-    Sinaleira(/*int tempoA*/){
+    Sinaleira(int tempoA){
+        Random r = new Random();
+        id = qntCriadas;
+        qntCriadas++;
         veiculos = new ParametroVeiculos();
         tempo = new ParametroTempo();
-      //  tempoAcumulado = tempoA;
+        tempoAcumulado = tempoA;
         
+        qntVeiculos = qntVeiculos + 3+r.nextInt(4);//sortea de 3 a 6
+        
+        setTempo(tempoAcumulado);
+        setQntVeiculos(qntVeiculos);
     }
     
-    
+    /*
+        Passa a quantidade de viculos para
+        o atributo do tipo ParametroVeiculos
+    */
     public void setQntVeiculos(double valor){
         veiculos.determinaPertinecias(valor);
     }
     
+    /*
+        Passa o tempo que a sinaleira estah
+        fechada para o atributo do tipo
+        ParametroTempo
+    */
     public void setTempo(double valor){
         tempo.determinaPertinecias(valor);
     }
+    
+    public double getDefuzzy(){return defuzzy;}
+    
+    public void setEstado(String est){
+        estado = est;        
+    }
+    
+    public String getEstado(){return estado;}
     
     /*
         Zera o tempo que a sinaleira esta fechada, e
         diminui a quantidade de carros na via, pois alguns 
         passam pela sinaleira
     */
-    /*public void abreSinaleira(){
+    public void abreSinaleira(){
         Random r = new Random();
         tempoAcumulado = 0;
-        qntVeiculos = qntVeiculos - 3+r.nextInt(3-qntVeiculos)
+        qntVeiculos = qntVeiculos - 3+r.nextInt(4);//Sortea um numro entre 3 e 6, o numero sorteado eh subtraido da quantidade
+                                                  //veihculos, ou seja, os veihculos que passaram pela sinaleira
         
+        //Trata se caso passe mais veiculos do que tinha, o que nao pode acontecer
+        if(qntVeiculos<0){
+            qntVeiculos = 0;
+        }
     
-    }*/ 
+        setTempo(tempoAcumulado);
+        setQntVeiculos(qntVeiculos);
+    }
+    
+     
+    /*
+        quando a sinaleira permanece fechada
+        eh incrementado um minuto ao seu tempo,
+        pois esse eh o tempo que outra ficarah
+        aberta, tambehm eh incrementado um valor
+        aleatorio de veiculos, que chegam ateh a
+        sinaleira fechada
+    */
+    public void ficaFechadaSinaleira(){
+        Random r = new Random();
+        tempoAcumulado = tempoAcumulado + 1;
+        qntVeiculos = qntVeiculos + r.nextInt(5);
+
+        setTempo(tempoAcumulado);
+        setQntVeiculos(qntVeiculos);
+    }
+
+    
+    
     
     public void determinaPrioridade(){
         prioridadeAberturaBaixa = regraPrioridadeAberturaBaixa();
         prioridadeAberturaMedia = regraPrioridadeAberturaMedia();
-        prioridadeAberturaAlta =  regraPrioridadeAberturaAlta();           
+        prioridadeAberturaAlta =  regraPrioridadeAberturaAlta();
+        defuzzyficacao();
     }
     
     /*
@@ -180,22 +228,36 @@ public class Sinaleira{
     }
     
     
-    public double defuzzyficacao(){
-    
-        double defuzzy;
-        
+    public void defuzzyficacao(){
+           
         double baixa = 100.0; /*(10+20+30+40) faixa determinada para prioridade baixa*/
         double media = 180.0; /*(50+60+70) faixa determinada para prioridade media*/
         double alta = 270.0;  /*(80+90+100) faixa determinada para prioridade alta*/       
         
         defuzzy = ((baixa*prioridadeAberturaBaixa)+(media*prioridadeAberturaMedia)+(alta*prioridadeAberturaAlta))/((4.0*prioridadeAberturaBaixa)+(3.0*prioridadeAberturaMedia)+(3.0*prioridadeAberturaAlta));
-        return defuzzy;
+        
     }
     
     public String toString(){
-    
-        return String.format("%s %s\t##Prioridade de Abertura Sinaleira##\n"
-                +            "Baixa = %f\n Media = %f\n Alta = %f\n Defuzzy = %f\n",veiculos, tempo, prioridadeAberturaBaixa,prioridadeAberturaMedia,prioridadeAberturaAlta, defuzzyficacao());
+
+        return  String.format("\n#######################################################\n"
+                        +       "#                       Sinaleira %d                  #\n"
+                        +       "#######################################################\n"
+                        +       "#                  Quantidade de Veiculos  %d         #\n"
+                        +       "#######################################################\n"
+                        +       "%s\n"
+                        +       "#######################################################\n"
+                        +       "#                          Tempo   %d                 #\n"
+                        +       "#######################################################\n"
+                        +       "%s\n"
+                        +       "#######################################################\n"
+                        +       "#             Prioridade Abertura Sinaleira           #\n"
+                        +       "#######################################################\n"
+                        +       "#       Baixa = %.2f       Media = %.2f  Alta = %.2f  #\n"
+                        +       "#######################################################\n"
+                        +       "#      Defuzzy = %.2f  Sinaleira %s             #\n"
+                        +       "#######################################################\n",
+                                id, qntVeiculos, veiculos, tempoAcumulado, tempo, prioridadeAberturaBaixa, prioridadeAberturaMedia, prioridadeAberturaAlta, defuzzy, estado);
     }
     
 }
