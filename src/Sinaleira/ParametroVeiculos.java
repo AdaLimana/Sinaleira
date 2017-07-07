@@ -118,9 +118,9 @@ public class ParametroVeiculos extends Fuzzy {
         return pertinencia;
     }
     
-    public String toString(){
+    /*public String toString(){
     
         return String.format("\n\t##Parametro Quantidade veiculos##%s",super.toString());
-    }
+    }*/
     
 }
