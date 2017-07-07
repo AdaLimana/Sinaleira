@@ -32,8 +32,10 @@ public abstract class Fuzzy {
     public double getPertinenciaAlta(){return pertinenciaAlta;}
     
     public String toString(){
-        return String.format("\nPertinencia Baixa = %f\nPertinencia media = %f\n"
-                +            "Pertinencia Alta = %f\n",pertinenciaBaixa, pertinenciaMedia, pertinenciaAlta);
+        return String.format("#Pertinencia Baixa = %.2f                             #\n"
+                +            "#Pertinencia media = %.2f                             #\n"
+                +            "#Pertinencia Alta = %.2f                              #",
+                             pertinenciaBaixa, pertinenciaMedia, pertinenciaAlta);
     }
 
     
