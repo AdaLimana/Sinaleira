@@ -127,9 +127,9 @@ public class ParametroTempo extends Fuzzy{
         return pertinencia;
     }
     
-    public String toString(){
+   /* public String toString(){
     
         return String.format("\n\t##Parametro Tempo sinaleira fechada##%s",super.toString());
-    }
+    }*/
     
 }
